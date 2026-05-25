@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCROLL BREAK</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Syne+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --surface: #111;
+    --border: #222;
+    --accent: #c8f135;
+    --accent2: #ff4d4d;
+    --text: #f0f0f0;
+    --muted: #555;
+    --card: #161616;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Syne', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* NOISE OVERLAY */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.4;
+  }
+
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 32px;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 100;
+  }
+
+  .logo {
+    font-size: 1.1rem;
+    font-weight: 800;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  .logo span { color: var(--accent); }
+
+  .api-btn {
+    background: none;
+    border: 1px solid var(--muted);
+    color: var(--muted);
+    padding: 6px 14px;
+    font-family: 'Syne Mono', monospace;
+    font-size: 0.72rem;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s;
+    letter-spacing: 0.05em;
+  }
+  .api-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .api-btn.set { border-color: var(--accent); color: var(--accent); }
+
+  main {
+    flex: 1;
+    max-width: 760px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+
+  /* API KEY MODAL */
+  .modal-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-backdrop.open { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 36px;
+    width: 100%;
+    max-width: 440px;
+    border-radius: 8px;
+  }
+
+  .modal h2 { font-size: 1.1rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.05em; }
+  .modal p { color: var(--muted); font-size: 0.82rem; margin-bottom: 20px; line-height: 1.6; }
+
+  .modal input {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 12px 14px;
+    font-family: 'Syne Mono', monospace;
+    font-size: 0.8rem;
+    border-radius: 4px;
+    margin-bottom: 16px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .modal input:focus { border-color: var(--accent); }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #000;
+    border: none;
+    padding: 12px 24px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    border-radius: 4px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: opacity 0.2s;
+    width: 100%;
+  }
+  .btn-primary:hover { opacity: 0.88; }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* TABS */
+  .tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 40px;
+  }
+
+  .tab {
+    background: none;
+    border: none;
+    color: var(--muted);
+    padding: 12px 20px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.78rem;
+    cursor: pointer;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    margin-bottom: -1px;
+  }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab:hover:not(.active) { color: var(--text); }
+
+  .panel { display: none; }
+  .panel.active { display: block; animation: fadeIn 0.3s ease; }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  /* SECTION TITLES */
+  .section-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 20px;
+  }
+
+  /* INTENTION PANEL */
+  .intention-hero {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .intention-hero .big-q {
+    font-size: 2.2rem;
+    font-weight: 800;
+    line-height: 1.15;
+    margin-bottom: 10px;
+  }
+
+  .intention-hero .big-q span { color: var(--accent); }
+
+  .intention-hero p {
+    color: var(--muted);
+    font-size: 0.85rem;
+    max-width: 380px;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+
+  .platform-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+
+  .platform-chip {
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 12px 8px;
+    text-align: center;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+  .platform-chip:hover { border-color: var(--accent); color: var(--text); }
+  .platform-chip.selected { background: rgba(200,241,53,0.08); border-color: var(--accent); color: var(--accent); }
+
+  .intent-input {
+    width: 100%;
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 16px;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.9rem;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    outline: none;
+    resize: none;
+    min-height: 80px;
+    transition: border-color 0.2s;
+    line-height: 1.6;
+  }
+  .intent-input:focus { border-color: var(--accent); }
+  .intent-input::placeholder { color: var(--muted); }
+
+  .time-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .time-chip {
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 8px 16px;
+    font-family: 'Syne Mono', monospace;
+    font-size: 0.8rem;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s;
+  }
+  .time-chip:hover, .time-chip.selected {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(200,241,53,0.06);
+  }
+
+  /* AI RESPONSE BOX */
+  .ai-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    padding: 20px;
+    border-radius: 6px;
+    margin-top: 20px;
+    font-size: 0.88rem;
+    line-height: 1.75;
+    color: var(--text);
+    min-height: 60px;
+    position: relative;
+  }
+
+  .ai-box .ai-label {
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+
+  .ai-box .thinking {
+    color: var(--muted);
+    font-family: 'Syne Mono', monospace;
+    font-size: 0.8rem;
+    animation: pulse 1.2s ease-in-out infinite;
+  }
+
+  @keyframes pulse { 0%,100%{opacity:0.4} 50%{opacity:1} }
+
+  /* REFLECTION PANEL */
+  .timer-display {
+    text-align: center;
+    padding: 40px 0 30px;
+  }
+
+  .timer-big {
+    font-family: 'Syne Mono', monospace;
+    font-size: 4.5rem;
+    font-weight: 400;
+    color: var(--accent);
+    letter-spacing: -0.02em;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .timer-label { color: var(--muted); font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; }
+
+  .timer-controls { display: flex; gap: 12px; justify-content: center; margin-top: 24px; }
+
+  .btn-ghost {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 10px 22px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.8rem;
+    cursor: pointer;
+    border-radius: 4px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: all 0.2s;
+  }
+  .btn-ghost:hover { border-color: var(--text); }
+  .btn-danger { border-color: var(--accent2); color: var(--accent2); }
+  .btn-danger:hover { background: rgba(255,77,77,0.08); }
+
+  .reflect-questions { margin-top: 8px; }
+  .reflect-q { margin-bottom: 20px; }
+  .reflect-q label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .reflect-q textarea {
+    width: 100%;
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 12px;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.85rem;
+    border-radius: 6px;
+    outline: none;
+    resize: none;
+    min-height: 70px;
+    line-height: 1.6;
+    transition: border-color 0.2s;
+  }
+  .reflect-q textarea:focus { border-color: var(--accent); }
+  .reflect-q textarea::placeholder { color: var(--muted); }
+
+  .mood-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .mood-chip {
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 8px 14px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    border-radius: 20px;
+    transition: all 0.2s;
+  }
+  .mood-chip:hover, .mood-chip.selected { border-color: var(--accent); color: var(--accent); background: rgba(200,241,53,0.06); }
+
+  /* HISTORY PANEL */
+  .history-empty {
+    text-align: center;
+    padding: 60px 0;
+    color: var(--muted);
+    font-size: 0.85rem;
+  }
+
+  .history-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 18px 20px;
+    border-radius: 6px;
+    margin-bottom: 12px;
+    position: relative;
+    transition: border-color 0.2s;
+  }
+  .history-item:hover { border-color: var(--border); }
+
+  .history-item .h-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+
+  .h-platform {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: rgba(200,241,53,0.08);
+    padding: 3px 10px;
+    border-radius: 3px;
+  }
+
+  .h-meta {
+    font-family: 'Syne Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+
+  .h-intent {
+    font-size: 0.85rem;
+    color: var(--text);
+    margin-bottom: 6px;
+    line-height: 1.5;
+  }
+
+  .h-mood {
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+
+  /* STREAK */
+  .streak-bar {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 20px;
+    border-radius: 6px;
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .streak-num {
+    font-family: 'Syne Mono', monospace;
+    font-size: 2.8rem;
+    color: var(--accent);
+    font-weight: 400;
+    line-height: 1;
+    min-width: 60px;
+    text-align: center;
+  }
+
+  .streak-info h3 { font-size: 0.85rem; font-weight: 700; margin-bottom: 4px; }
+  .streak-info p { font-size: 0.78rem; color: var(--muted); line-height: 1.5; }
+
+  /* NO KEY WARNING */
+  .no-key-warn {
+    background: rgba(255,77,77,0.06);
+    border: 1px solid rgba(255,77,77,0.3);
+    color: var(--accent2);
+    padding: 12px 16px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    margin-bottom: 20px;
+    display: none;
+  }
+  .no-key-warn.show { display: block; }
+
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 32px 0;
+  }
+
+  .insight-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 24px;
+    margin-bottom: 8px;
+    cursor: pointer;
+  }
+  .insight-toggle span {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .insight-toggle:hover span { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">SCROLL<span>BREAK</span></div>
+  <button class="api-btn" id="apiBtn" onclick="openModal()">⚡ SET GROQ KEY</button>
+</header>
+
+<!-- API KEY MODAL -->
+<div class="modal-backdrop" id="modal">
+  <div class="modal">
+    <h2>GROQ API KEY</h2>
+    <p>Your key stays in your browser (localStorage). It's never sent anywhere except directly to Groq's API.</p>
+    <input type="password" id="apiKeyInput" placeholder="gsk_..." />
+    <button class="btn-primary" onclick="saveKey()">SAVE KEY</button>
+  </div>
+</div>
+
+<main>
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('intention')">Intention</button>
+    <button class="tab" onclick="switchTab('reflect')">Reflect</button>
+    <button class="tab" onclick="switchTab('history')">History</button>
+  </div>
+
+  <!-- INTENTION PANEL -->
+  <div class="panel active" id="panel-intention">
+    <div class="intention-hero">
+      <div class="big-q">Why are you <span>opening</span> this?</div>
+      <p>Set your intention before you scroll. It takes 20 seconds and makes a real difference.</p>
+    </div>
+
+    <div class="no-key-warn" id="warnNoKey">⚠ Add your Groq API key to get AI-powered coaching on your intention.</div>
+
+    <div class="section-label">Platform</div>
+    <div class="platform-grid">
+      <div class="platform-chip" onclick="togglePlatform(this, 'Twitter/X')">Twitter/X</div>
+      <div class="platform-chip" onclick="togglePlatform(this, 'Instagram')">Instagram</div>
+      <div class="platform-chip" onclick="togglePlatform(this, 'YouTube')">YouTube</div>
+      <div class="platform-chip" onclick="togglePlatform(this, 'TikTok')">TikTok</div>
+      <div class="platform-chip" onclick="togglePlatform(this, 'Reddit')">Reddit</div>
+      <div class="platform-chip" onclick="togglePlatform(this, 'News')">News</div>
+    </div>
+
+    <div class="section-label">Your intention</div>
+    <textarea class="intent-input" id="intentInput" placeholder="e.g. Checking if my friend replied, researching something specific, unwinding for 10 mins..." rows="3"></textarea>
+
+    <div class="section-label">Time limit</div>
+    <div class="time-row">
+      <div class="time-chip" onclick="selectTime(this, 10)">10 min</div>
+      <div class="time-chip" onclick="selectTime(this, 15)">15 min</div>
+      <div class="time-chip" onclick="selectTime(this, 20)">20 min</div>
+      <div class="time-chip" onclick="selectTime(this, 30)">30 min</div>
+    </div>
+
+    <button class="btn-primary" id="submitIntention" onclick="submitIntention()" style="margin-top:20px">
+      SET INTENTION + GET COACHING
+    </button>
+
+    <div class="ai-box" id="aiBox" style="display:none">
+      <div class="ai-label">🤖 Llama via Groq</div>
+      <div id="aiResponse"></div>
+    </div>
+  </div>
+
+  <!-- REFLECT PANEL -->
+  <div class="panel" id="panel-reflect">
+    <div class="timer-display">
+      <div class="timer-big" id="timerDisplay">00:00</div>
+      <div class="timer-label">Session Timer</div>
+      <div class="timer-controls">
+        <button class="btn-ghost" id="timerToggle" onclick="toggleTimer()">START</button>
+        <button class="btn-ghost" onclick="resetTimer()">RESET</button>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="section-label">After your session — reflect</div>
+
+    <div class="reflect-questions">
+      <div class="reflect-q">
+        <label>How do you feel RIGHT NOW?</label>
+        <div class="mood-row" id="moodRow">
+          <div class="mood-chip" onclick="selectMood(this)">😌 Calm</div>
+          <div class="mood-chip" onclick="selectMood(this)">😰 Anxious</div>
+          <div class="mood-chip" onclick="selectMood(this)">😤 Irritated</div>
+          <div class="mood-chip" onclick="selectMood(this)">😔 Low</div>
+          <div class="mood-chip" onclick="selectMood(this)">😐 Numb</div>
+          <div class="mood-chip" onclick="selectMood(this)">🔥 Motivated</div>
+          <div class="mood-chip" onclick="selectMood(this)">😕 Regretful</div>
+        </div>
+      </div>
+
+      <div class="reflect-q">
+        <label>Did you achieve your intention?</label>
+        <div class="mood-row">
+          <div class="mood-chip" onclick="selectAchieved(this)" data-val="yes">✅ Yes</div>
+          <div class="mood-chip" onclick="selectAchieved(this)" data-val="partial">〰 Partially</div>
+          <div class="mood-chip" onclick="selectAchieved(this)" data-val="no">❌ No, I drifted</div>
+        </div>
+      </div>
+
+      <div class="reflect-q">
+        <label>What would you do differently?</label>
+        <textarea id="reflectNote" placeholder="Next time I'll..." rows="3"></textarea>
+      </div>
+    </div>
+
+    <button class="btn-primary" onclick="saveReflection()">SAVE REFLECTION</button>
+
+    <div class="ai-box" id="reflectAiBox" style="display:none">
+      <div class="ai-label">🤖 Llama via Groq</div>
+      <div id="reflectAiResponse"></div>
+    </div>
+  </div>
+
+  <!-- HISTORY PANEL -->
+  <div class="panel" id="panel-history">
+    <div class="streak-bar">
+      <div class="streak-num" id="streakNum">0</div>
+      <div class="streak-info">
+        <h3>Intentional sessions today</h3>
+        <p id="streakSub">Start your first intention-led session to build your streak.</p>
+      </div>
+    </div>
+
+    <div class="section-label">Session Log</div>
+    <div id="historyList">
+      <div class="history-empty">No sessions logged yet. Set your first intention above.</div>
+    </div>
+
+    <div class="insight-toggle" id="insightToggle" onclick="getWeeklyInsight()" style="display:none">
+      <span>⚡ Get AI pattern insight on my sessions</span>
+    </div>
+
+    <div class="ai-box" id="insightBox" style="display:none">
+      <div class="ai-label">🤖 Llama via Groq — Weekly Pattern</div>
+      <div id="insightResponse"></div>
+    </div>
+  </div>
+</main>
+
+<script>
+  let apiKey = localStorage.getItem('groq_api_key') || '';
+  let selectedPlatform = '';
+  let selectedTime = 15;
+  let timerInterval = null;
+  let timerSeconds = 0;
+  let timerRunning = false;
+  let selectedMood = '';
+  let selectedAchieved = '';
+  let sessions = JSON.parse(localStorage.getItem('sb_sessions') || '[]');
+  let lastIntention = '';
+
+  // Init
+  if (apiKey) { document.getElementById('apiBtn').classList.add('set'); document.getElementById('apiBtn').textContent = '⚡ GROQ KEY SET'; }
+  renderHistory();
+  updateStreak();
+
+  function openModal() {
+    document.getElementById('modal').classList.add('open');
+    document.getElementById('apiKeyInput').value = apiKey;
+  }
+
+  function saveKey() {
+    const val = document.getElementById('apiKeyInput').value.trim();
+    if (!val) return;
+    apiKey = val;
+    localStorage.setItem('groq_api_key', val);
+    document.getElementById('modal').classList.remove('open');
+    document.getElementById('apiBtn').classList.add('set');
+    document.getElementById('apiBtn').textContent = '⚡ GROQ KEY SET';
+  }
+
+  document.getElementById('modal').addEventListener('click', function(e) {
+    if (e.target === this) this.classList.remove('open');
+  });
+
+  function switchTab(name) {
+    document.querySelectorAll('.tab').forEach((t,i) => t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    const tabs = ['intention','reflect','history'];
+    document.querySelectorAll('.tab')[tabs.indexOf(name)].classList.add('active');
+    document.getElementById('panel-' + name).classList.add('active');
+  }
+
+  function togglePlatform(el, name) {
+    document.querySelectorAll('.platform-chip').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedPlatform = name;
+  }
+
+  function selectTime(el, mins) {
+    document.querySelectorAll('.time-chip').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedTime = mins;
+  }
+
+  async function submitIntention() {
+    const intent = document.getElementById('intentInput').value.trim();
+    if (!intent) { document.getElementById('intentInput').focus(); return; }
+    if (!selectedPlatform) { alert('Pick a platform first.'); return; }
+
+    lastIntention = intent;
+
+    // Save session stub
+    const session = {
+      id: Date.now(),
+      platform: selectedPlatform,
+      intention: intent,
+      timeLimitMins: selectedTime,
+      timestamp: new Date().toISOString(),
+      mood: null,
+      achieved: null,
+      note: null
+    };
+    sessions.unshift(session);
+    saveSessions();
+    updateStreak();
+
+    if (!apiKey) {
+      document.getElementById('warnNoKey').classList.add('show');
+      return;
+    }
+
+    const box = document.getElementById('aiBox');
+    const resp = document.getElementById('aiResponse');
+    box.style.display = 'block';
+    resp.innerHTML = '<span class="thinking">Llama is thinking...</span>';
+
+    const prompt = `You are a mindful digital wellness coach. Be direct, warm, and concise (3-4 sentences max).
+
+A user is about to open ${selectedPlatform}. Their stated intention: "${intent}". They've set a ${selectedTime}-minute limit.
+
+Give them one sharp observation about their intention (is it specific enough? is it a cover for mindless scrolling?), and one practical tip to stay on track. Be honest but supportive. No bullet points, no headers — just natural spoken text.`;
+
+    try {
+      const data = await callGroq(prompt);
+      resp.textContent = data;
+    } catch(e) {
+      resp.innerHTML = `<span style="color:var(--accent2)">API error: ${e.message}</span>`;
+    }
+  }
+
+  function selectMood(el) {
+    document.querySelectorAll('#moodRow .mood-chip').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedMood = el.textContent;
+  }
+
+  function selectAchieved(el) {
+    el.closest('.mood-row').querySelectorAll('.mood-chip').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedAchieved = el.dataset.val;
+  }
+
+  async function saveReflection() {
+    if (!selectedMood) { alert('How are you feeling?'); return; }
+    if (!selectedAchieved) { alert('Did you achieve your intention?'); return; }
+
+    // Update most recent session
+    if (sessions.length > 0) {
+      sessions[0].mood = selectedMood;
+      sessions[0].achieved = selectedAchieved;
+      sessions[0].note = document.getElementById('reflectNote').value.trim();
+      sessions[0].durationSecs = timerSeconds;
+      saveSessions();
+      renderHistory();
+    }
+
+    if (!apiKey) { alert('Add your Groq key for AI coaching.'); return; }
+
+    const box = document.getElementById('reflectAiBox');
+    const resp = document.getElementById('reflectAiResponse');
+    box.style.display = 'block';
+    resp.innerHTML = '<span class="thinking">Llama is thinking...</span>';
+
+    const note = document.getElementById('reflectNote').value.trim();
+    const mins = Math.round(timerSeconds / 60);
+
+    const prompt = `You are a mindful digital wellness coach. Be warm, direct, and brief (3-4 sentences).
+
+After a ${sessions[0]?.platform || 'social media'} session (${mins} min, intended: ${sessions[0]?.timeLimitMins || selectedTime} min):
+- Intention: "${sessions[0]?.intention || lastIntention}"
+- Goal achieved: ${selectedAchieved}
+- Mood after: ${selectedMood}
+- Their note: "${note || 'none'}"
+
+Give a brief, specific reflection — acknowledge what happened, name one pattern you notice, and give ONE concrete thing to try next time. No lists, just natural spoken text.`;
+
+    try {
+      const data = await callGroq(prompt);
+      resp.textContent = data;
+    } catch(e) {
+      resp.innerHTML = `<span style="color:var(--accent2)">API error: ${e.message}</span>`;
+    }
+  }
+
+  async function getWeeklyInsight() {
+    if (!apiKey) { alert('Add your Groq key first.'); return; }
+    const box = document.getElementById('insightBox');
+    const resp = document.getElementById('insightResponse');
+    box.style.display = 'block';
+    resp.innerHTML = '<span class="thinking">Llama is analyzing your patterns...</span>';
+
+    const recent = sessions.slice(0, 10).map(s =>
+      `Platform: ${s.platform}, Intention: "${s.intention}", Achieved: ${s.achieved || 'not reflected'}, Mood after: ${s.mood || 'not logged'}`
+    ).join('\n');
+
+    const prompt = `You are a digital wellness coach analyzing a user's scrolling patterns. Be analytical, honest, and constructive (4-6 sentences).
+
+Recent sessions:
+${recent}
+
+Identify the most significant pattern you see — which platforms dominate, whether intentions are specific or vague, mood outcomes, achievement rates. Give one actionable strategy tailored to what you see. Speak directly to the user. No bullet points or headers.`;
+
+    try {
+      const data = await callGroq(prompt);
+      resp.textContent = data;
+    } catch(e) {
+      resp.innerHTML = `<span style="color:var(--accent2)">API error: ${e.message}</span>`;
+    }
+  }
+
+  async function callGroq(prompt) {
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        max_tokens: 300,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error?.message || 'Groq API error');
+    }
+    const data = await res.json();
+    return data.choices[0].message.content;
+  }
+
+  // TIMER
+  function toggleTimer() {
+    if (timerRunning) {
+      clearInterval(timerInterval);
+      timerRunning = false;
+      document.getElementById('timerToggle').textContent = 'RESUME';
+    } else {
+      timerRunning = true;
+      document.getElementById('timerToggle').textContent = 'PAUSE';
+      timerInterval = setInterval(() => {
+        timerSeconds++;
+        updateTimerDisplay();
+        // Warn at limit
+        if (sessions[0]?.timeLimitMins && timerSeconds === sessions[0].timeLimitMins * 60) {
+          flashTimer();
+        }
+      }, 1000);
+    }
+  }
+
+  function resetTimer() {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    timerSeconds = 0;
+    document.getElementById('timerToggle').textContent = 'START';
+    updateTimerDisplay();
+  }
+
+  function updateTimerDisplay() {
+    const m = String(Math.floor(timerSeconds / 60)).padStart(2, '0');
+    const s = String(timerSeconds % 60).padStart(2, '0');
+    document.getElementById('timerDisplay').textContent = `${m}:${s}`;
+  }
+
+  function flashTimer() {
+    const el = document.getElementById('timerDisplay');
+    el.style.color = 'var(--accent2)';
+    setTimeout(() => el.style.color = 'var(--accent)', 3000);
+  }
+
+  // HISTORY
+  function saveSessions() {
+    localStorage.setItem('sb_sessions', JSON.stringify(sessions.slice(0, 100)));
+  }
+
+  function renderHistory() {
+    const list = document.getElementById('historyList');
+    if (sessions.length === 0) {
+      list.innerHTML = '<div class="history-empty">No sessions logged yet. Set your first intention above.</div>';
+      document.getElementById('insightToggle').style.display = 'none';
+      return;
+    }
+
+    document.getElementById('insightToggle').style.display = 'flex';
+
+    list.innerHTML = sessions.slice(0, 20).map(s => {
+      const d = new Date(s.timestamp);
+      const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      const timeStr = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+      const dur = s.durationSecs ? `${Math.round(s.durationSecs/60)}m` : `${s.timeLimitMins}m limit`;
+      return `<div class="history-item">
+        <div class="h-top">
+          <span class="h-platform">${s.platform}</span>
+          <span class="h-meta">${dateStr} ${timeStr} · ${dur}</span>
+        </div>
+        <div class="h-intent">"${s.intention}"</div>
+        ${s.mood ? `<div class="h-mood">${s.mood} · ${s.achieved === 'yes' ? '✅ achieved' : s.achieved === 'partial' ? '〰 partial' : '❌ drifted'}</div>` : '<div class="h-mood" style="color:var(--muted);font-size:0.72rem">No reflection yet</div>'}
+      </div>`;
+    }).join('');
+  }
+
+  function updateStreak() {
+    const today = new Date().toDateString();
+    const todaySessions = sessions.filter(s => new Date(s.timestamp).toDateString() === today);
+    document.getElementById('streakNum').textContent = todaySessions.length;
+    document.getElementById('streakSub').textContent = todaySessions.length === 0
+      ? 'Start your first intention-led session to build your streak.'
+      : `${todaySessions.length} intentional session${todaySessions.length > 1 ? 's' : ''} today. Keep it up.`;
+  }
+
+  // Default selections
+  selectTime(document.querySelector('.time-chip'), 15);
+</script>
+</body>
+</html>
