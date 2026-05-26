@@ -1,0 +1,151 @@
+/* content.css — ScrollBreak overlay styles */
+
+#sb-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  background: rgba(10, 10, 10, 0.96) !important;
+  z-index: 2147483647 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+#sb-card {
+  background: #111 !important;
+  border: 1px solid #222 !important;
+  border-radius: 12px !important;
+  padding: 36px !important;
+  width: 100% !important;
+  max-width: 480px !important;
+  margin: 20px !important;
+}
+
+#sb-logo {
+  font-size: 1rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.2em !important;
+  text-transform: uppercase !important;
+  color: #f0f0f0 !important;
+  margin-bottom: 24px !important;
+}
+
+#sb-logo span { color: #c8f135 !important; }
+
+#sb-question {
+  font-size: 1.4rem !important;
+  font-weight: 700 !important;
+  color: #f0f0f0 !important;
+  margin-bottom: 20px !important;
+  line-height: 1.3 !important;
+}
+
+#sb-question em { color: #c8f135 !important; font-style: normal !important; }
+
+#sb-intent {
+  width: 100% !important;
+  background: #1a1a1a !important;
+  border: 1px solid #333 !important;
+  color: #f0f0f0 !important;
+  padding: 12px !important;
+  font-size: 0.9rem !important;
+  border-radius: 6px !important;
+  resize: none !important;
+  outline: none !important;
+  margin-bottom: 16px !important;
+  line-height: 1.6 !important;
+  box-sizing: border-box !important;
+  font-family: inherit !important;
+}
+
+#sb-intent:focus { border-color: #c8f135 !important; }
+#sb-intent::placeholder { color: #444 !important; }
+
+#sb-time-label {
+  font-size: 0.68rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.2em !important;
+  text-transform: uppercase !important;
+  color: #555 !important;
+  margin-bottom: 10px !important;
+}
+
+#sb-times {
+  display: flex !important;
+  gap: 8px !important;
+  margin-bottom: 20px !important;
+}
+
+.sb-time {
+  background: #1a1a1a !important;
+  border: 1px solid #333 !important;
+  color: #555 !important;
+  padding: 7px 14px !important;
+  font-size: 0.78rem !important;
+  cursor: pointer !important;
+  border-radius: 4px !important;
+  transition: all 0.2s !important;
+  font-family: monospace !important;
+}
+
+.sb-time:hover, .sb-time.selected {
+  border-color: #c8f135 !important;
+  color: #c8f135 !important;
+  background: rgba(200,241,53,0.06) !important;
+}
+
+#sb-ai-box {
+  background: #161616 !important;
+  border: 1px solid #222 !important;
+  border-left: 3px solid #c8f135 !important;
+  padding: 14px !important;
+  border-radius: 6px !important;
+  margin-bottom: 16px !important;
+}
+
+#sb-ai-label {
+  font-size: 0.62rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.15em !important;
+  text-transform: uppercase !important;
+  color: #c8f135 !important;
+  margin-bottom: 8px !important;
+}
+
+#sb-ai-text {
+  font-size: 0.84rem !important;
+  color: #f0f0f0 !important;
+  line-height: 1.7 !important;
+}
+
+#sb-proceed {
+  width: 100% !important;
+  background: #c8f135 !important;
+  color: #000 !important;
+  border: none !important;
+  padding: 13px !important;
+  font-weight: 700 !important;
+  font-size: 0.85rem !important;
+  letter-spacing: 0.1em !important;
+  border-radius: 6px !important;
+  cursor: pointer !important;
+  margin-bottom: 10px !important;
+  font-family: inherit !important;
+}
+
+#sb-proceed:disabled { opacity: 0.5 !important; cursor: not-allowed !important; }
+#sb-proceed:hover:not(:disabled) { opacity: 0.88 !important; }
+
+#sb-skip {
+  width: 100% !important;
+  background: none !important;
+  border: none !important;
+  color: #444 !important;
+  font-size: 0.78rem !important;
+  cursor: pointer !important;
+  padding: 6px !important;
+  font-family: inherit !important;
+}
+
+#sb-skip:hover { color: #888 !important; }
