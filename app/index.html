@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCROLLBREAK</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Syne+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+
+<header>
+  <div class="logo">SCROLL<span>BREAK</span></div>
+  <div class="header-right">
+    <div class="sync-status" id="syncStatus">⚫ local only</div>
+    <button class="api-btn" id="apiBtn" onclick="openModal('settings')">⚙ SETTINGS</button>
+  </div>
+</header>
+
+<!-- SETTINGS MODAL -->
+<div class="modal-backdrop" id="modal-settings">
+  <div class="modal">
+    <div class="modal-close" onclick="closeModal('settings')">✕</div>
+    <h2>SETTINGS</h2>
+
+    <div class="setting-group">
+      <label>Groq API Key</label>
+      <input type="password" id="groqKeyInput" placeholder="gsk_..." />
+    </div>
+
+    <div class="setting-group">
+      <label>Backend URL <span class="optional">(optional — for sync)</span></label>
+      <input type="text" id="backendUrlInput" placeholder="https://your-backend.com" />
+    </div>
+
+    <div class="setting-group">
+      <label>User ID <span class="optional">(for multi-device sync)</span></label>
+      <input type="text" id="userIdInput" placeholder="e.g. henry@email.com" />
+    </div>
+
+    <div class="setting-group">
+      <label>Role</label>
+      <select id="roleSelect">
+        <option value="user">Personal User</option>
+        <option value="family_admin">Family Admin</option>
+        <option value="therapist">Therapist</option>
+      </select>
+    </div>
+
+    <button class="btn-primary" onclick="saveSettings()">SAVE SETTINGS</button>
+  </div>
+</div>
+
+<!-- INVITE MODAL -->
+<div class="modal-backdrop" id="modal-invite">
+  <div class="modal">
+    <div class="modal-close" onclick="closeModal('invite')">✕</div>
+    <h2>ADD MEMBER</h2>
+    <div class="setting-group">
+      <label>Name</label>
+      <input type="text" id="memberName" placeholder="e.g. Sarah" />
+    </div>
+    <div class="setting-group">
+      <label>Email / ID</label>
+      <input type="text" id="memberId" placeholder="sarah@email.com" />
+    </div>
+    <div class="setting-group">
+      <label>Role</label>
+      <select id="memberRole">
+        <option value="member">Member</option>
+        <option value="child">Child (restricted)</option>
+        <option value="patient">Patient</option>
+      </select>
+    </div>
+    <button class="btn-primary" onclick="addMember()">ADD MEMBER</button>
+  </div>
+</div>
+
+<main>
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('intention')">Intention</button>
+    <button class="tab" onclick="switchTab('reflect')">Reflect</button>
+    <button class="tab" onclick="switchTab('history')">History</button>
+    <button class="tab" onclick="switchTab('dashboard')">Dashboard</button>
+    <button class="tab" onclick="switchTab('therapist')">Analytics</button>
+  </div>
+
+  <!-- INTENTION -->
+  <div class="panel active" id="panel-intention">
+    <div class="intention-hero">
+      <div class="big-q">Why are you <span>opening</span> this?</div>
+      <p>Set your intention before you scroll. 20 seconds. Real difference.</p>
+    </div>
+    <div class="no-key-warn" id="warnNoKey">⚠ Add your Groq key in Settings for AI coaching.</div>
+    <div class="section-label">Platform</div>
+    <div class="platform-grid">
+      <div class="platform-chip" onclick="togglePlatform(this,'Twitter/X')">Twitter/X</div>
+      <div class="platform-chip" onclick="togglePlatform(this,'Instagram')">Instagram</div>
+      <div class="platform-chip" onclick="togglePlatform(this,'YouTube')">YouTube</div>
+      <div class="platform-chip" onclick="togglePlatform(this,'TikTok')">TikTok</div>
+      <div class="platform-chip" onclick="togglePlatform(this,'Reddit')">Reddit</div>
+      <div class="platform-chip" onclick="togglePlatform(this,'News')">News</div>
+    </div>
+    <div class="section-label">Your intention</div>
+    <textarea class="intent-input" id="intentInput" placeholder="e.g. Checking if my friend replied, researching something specific..." rows="3"></textarea>
+    <div class="section-label">Time limit</div>
+    <div class="time-row">
+      <div class="time-chip selected" onclick="selectTime(this,10)">10 min</div>
+      <div class="time-chip" onclick="selectTime(this,15)">15 min</div>
+      <div class="time-chip" onclick="selectTime(this,20)">20 min</div>
+      <div class="time-chip" onclick="selectTime(this,30)">30 min</div>
+    </div>
+    <button class="btn-primary" onclick="submitIntention()" style="margin-top:20px">SET INTENTION + GET COACHING</button>
+    <div class="ai-box" id="aiBox" style="display:none">
+      <div class="ai-label">🤖 Llama via Groq</div>
+      <div id="aiResponse"></div>
+    </div>
+  </div>
+
+  <!-- REFLECT -->
+  <div class="panel" id="panel-reflect">
+    <div class="timer-display">
+      <div class="timer-big" id="timerDisplay">00:00</div>
+      <div class="timer-label">Session Timer</div>
+      <div class="timer-controls">
+        <button class="btn-ghost" id="timerToggle" onclick="toggleTimer()">START</button>
+        <button class="btn-ghost" onclick="resetTimer()">RESET</button>
+      </div>
+    </div>
+    <hr class="divider">
+    <div class="section-label">After your session — reflect</div>
+    <div class="reflect-q">
+      <label>How do you feel RIGHT NOW?</label>
+      <div class="mood-row" id="moodRow">
+        <div class="mood-chip" onclick="selectMood(this)">😌 Calm</div>
+        <div class="mood-chip" onclick="selectMood(this)">😰 Anxious</div>
+        <div class="mood-chip" onclick="selectMood(this)">😤 Irritated</div>
+        <div class="mood-chip" onclick="selectMood(this)">😔 Low</div>
+        <div class="mood-chip" onclick="selectMood(this)">😐 Numb</div>
+        <div class="mood-chip" onclick="selectMood(this)">🔥 Motivated</div>
+        <div class="mood-chip" onclick="selectMood(this)">😕 Regretful</div>
+      </div>
+    </div>
+    <div class="reflect-q">
+      <label>Did you achieve your intention?</label>
+      <div class="mood-row">
+        <div class="mood-chip" onclick="selectAchieved(this)" data-val="yes">✅ Yes</div>
+        <div class="mood-chip" onclick="selectAchieved(this)" data-val="partial">〰 Partially</div>
+        <div class="mood-chip" onclick="selectAchieved(this)" data-val="no">❌ No, drifted</div>
+      </div>
+    </div>
+    <div class="reflect-q">
+      <label>What would you do differently?</label>
+      <textarea id="reflectNote" placeholder="Next time I'll..." rows="3"></textarea>
+    </div>
+    <button class="btn-primary" onclick="saveReflection()">SAVE REFLECTION</button>
+    <div class="ai-box" id="reflectAiBox" style="display:none">
+      <div class="ai-label">🤖 Llama via Groq</div>
+      <div id="reflectAiResponse"></div>
+    </div>
+  </div>
+
+  <!-- HISTORY -->
+  <div class="panel" id="panel-history">
+    <div class="streak-bar">
+      <div class="streak-num" id="streakNum">0</div>
+      <div class="streak-info">
+        <h3>Intentional sessions today</h3>
+        <p id="streakSub">Start your first intention-led session.</p>
+      </div>
+    </div>
+    <div class="section-label">Session Log</div>
+    <div id="historyList"><div class="history-empty">No sessions yet.</div></div>
+    <div class="insight-toggle" id="insightToggle" onclick="getWeeklyInsight()" style="display:none">
+      <span>⚡ Get AI pattern insight</span>
+    </div>
+    <div class="ai-box" id="insightBox" style="display:none">
+      <div class="ai-label">🤖 Llama — Pattern Analysis</div>
+      <div id="insightResponse"></div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD (Family/Team) -->
+  <div class="panel" id="panel-dashboard">
+    <div class="dash-header">
+      <div>
+        <div class="section-label" style="margin-bottom:4px">Team / Family Dashboard</div>
+        <p style="color:var(--muted);font-size:0.82rem">Track scrolling habits across your group.</p>
+      </div>
+      <button class="btn-ghost" onclick="openModal('invite')">+ ADD MEMBER</button>
+    </div>
+    <div id="memberGrid" class="member-grid"></div>
+    <hr class="divider">
+    <div class="section-label">Group Insights</div>
+    <div id="groupStats" class="group-stats"></div>
+    <button class="btn-primary" style="margin-top:20px" onclick="getGroupInsight()">GET GROUP AI INSIGHT</button>
+    <div class="ai-box" id="groupAiBox" style="display:none">
+      <div class="ai-label">🤖 Llama — Group Pattern</div>
+      <div id="groupAiResponse"></div>
+    </div>
+  </div>
+
+  <!-- THERAPIST ANALYTICS -->
+  <div class="panel" id="panel-therapist">
+    <div class="section-label">Clinical Analytics View</div>
+    <p style="color:var(--muted);font-size:0.82rem;margin-bottom:24px">Deep pattern analysis for practitioners and self-directed users.</p>
+
+    <div class="analytics-grid">
+      <div class="analytics-card" id="cardTotalSessions">
+        <div class="ac-num">0</div>
+        <div class="ac-label">Total Sessions</div>
+      </div>
+      <div class="analytics-card" id="cardAvgDuration">
+        <div class="ac-num">0m</div>
+        <div class="ac-label">Avg Duration</div>
+      </div>
+      <div class="analytics-card" id="cardAchievementRate">
+        <div class="ac-num">0%</div>
+        <div class="ac-label">Goal Achievement</div>
+      </div>
+      <div class="analytics-card" id="cardDriftRate">
+        <div class="ac-num">0%</div>
+        <div class="ac-label">Drift Rate</div>
+      </div>
+    </div>
+
+    <hr class="divider">
+    <div class="section-label">Mood After Scrolling — Distribution</div>
+    <div id="moodChart" class="mood-chart"></div>
+
+    <hr class="divider">
+    <div class="section-label">Platform Risk Index</div>
+    <div id="platformRisk" class="platform-risk"></div>
+
+    <hr class="divider">
+    <div class="section-label">Weekly Trend</div>
+    <div id="weeklyTrend" class="weekly-trend"></div>
+
+    <button class="btn-primary" style="margin-top:24px" onclick="getClinicalInsight()">GENERATE CLINICAL REPORT</button>
+    <div class="ai-box" id="clinicalAiBox" style="display:none">
+      <div class="ai-label">🤖 Llama — Clinical Report</div>
+      <div id="clinicalAiResponse"></div>
+    </div>
+  </div>
+</main>
+
+<script src="js/storage.js"></script>
+<script src="js/groq.js"></script>
+<script src="js/app.js"></script>
+<script src="js/dashboard.js"></script>
+<script src="js/analytics.js"></script>
+</body>
+</html>
