@@ -2,6 +2,8 @@
 
 > AI-powered doomscrolling intervention — intention setting, session timer, reflection journaling, pattern coaching, team dashboards, and clinical analytics. Powered by Groq Llama.
 
+![ScrollBreak App Preview](docs/screenshot.svg)
+
 ---
 
 ## What it does
@@ -22,31 +24,28 @@ ScrollBreak interrupts the doomscrolling habit at three points:
 
 ```
 scrollbreak/
-├── app/                      ← Web app (GitHub Pages)
-│   ├── index.html            ← Entry point
-│   ├── css/
-│   │   └── main.css          ← All styles
+├── index.html                ← GitHub Pages entry (redirects to app/)
+├── app/                      ← Web app
+│   ├── index.html
+│   ├── css/main.css
 │   └── js/
 │       ├── storage.js        ← localStorage + backend sync
-│       ├── groq.js           ← Groq API client + prompts
-│       ├── app.js            ← Intention, reflect, history logic
+│       ├── groq.js           ← Groq API client + all prompts
+│       ├── app.js            ← Intention, reflect, history
 │       ├── dashboard.js      ← Family/team dashboard
 │       └── analytics.js      ← Clinical analytics + charts
-│
 ├── extension/                ← Chrome extension
-│   ├── manifest.json         ← MV3 manifest
-│   ├── background.js         ← Service worker (tab interception)
+│   ├── manifest.json         ← MV3
+│   ├── background.js         ← Tab interception service worker
 │   ├── content.js            ← Intention overlay injected into pages
-│   ├── content.css           ← Overlay styles
-│   └── popup.html            ← Extension popup
-│
-├── backend/                  ← Optional sync backend
-│   ├── server.js             ← Express + SQLite API
+│   ├── content.css
+│   └── popup.html
+├── backend/                  ← Optional self-hosted sync server
+│   ├── server.js             ← Express + SQLite
 │   └── package.json
-│
 ├── docs/
-│   └── ARCHITECTURE.md
-│
+│   ├── ARCHITECTURE.md
+│   └── screenshot.svg
 └── README.md
 ```
 
@@ -58,17 +57,18 @@ scrollbreak/
 
 1. Go to [henrymorgandibie.github.io/scrollbreak](https://henrymorgandibie.github.io/scrollbreak)
 2. Click **⚙ SETTINGS** → paste your [Groq API key](https://console.groq.com)
-3. Set your first intention
+3. Pick a platform, write your intention, set a time limit
+4. Hit **SET INTENTION + GET COACHING** — Llama responds instantly
 
-### Chrome extension (local install)
+### Chrome extension (intercepts social media tabs)
 
 1. Clone this repo
 2. Open `chrome://extensions`
-3. Enable **Developer mode** (top right)
+3. Enable **Developer mode** (top right toggle)
 4. Click **Load unpacked** → select the `/extension` folder
-5. Open any social media tab — ScrollBreak intercepts it
+5. Open Twitter, YouTube, TikTok — ScrollBreak intercepts before the page loads
 
-### Backend (optional — for multi-device sync)
+### Backend (optional — multi-device sync)
 
 ```bash
 cd backend
@@ -76,7 +76,7 @@ npm install
 node server.js
 ```
 
-Deploy to Railway, Render, or Fly.io for production. Then in the web app Settings, add your backend URL and a user ID to enable sync.
+Deploy to Railway, Render, or Fly.io. Then in Settings, add your backend URL and a user ID to sync sessions across devices.
 
 ---
 
@@ -84,15 +84,15 @@ Deploy to Railway, Render, or Fly.io for production. Then in the web app Setting
 
 | Feature | Web App | Extension |
 |---|---|---|
-| Intention setting | ✅ | ✅ |
+| Intention check before scrolling | ✅ | ✅ |
 | Llama AI coaching | ✅ | ✅ |
-| Session timer | ✅ | — |
-| Reflection journal | ✅ | — |
-| Pattern analysis | ✅ | — |
-| Family dashboard | ✅ | — |
-| Clinical analytics | ✅ | — |
+| Session timer with limit alert | ✅ | — |
+| Mood + reflection journal | ✅ | — |
+| AI pattern analysis | ✅ | — |
+| Family / team dashboard | ✅ | — |
+| Clinical analytics view | ✅ | — |
 | Multi-device sync | ✅ (with backend) | — |
-| Tab interception | — | ✅ |
+| Tab interception overlay | — | ✅ |
 
 ---
 
@@ -100,22 +100,24 @@ Deploy to Railway, Render, or Fly.io for production. Then in the web app Setting
 
 | Layer | Choice |
 |---|---|
-| Frontend | Vanilla HTML/CSS/JS |
+| Frontend | Vanilla HTML/CSS/JS — no build step |
 | AI | Groq API — `llama-3.3-70b-versatile` |
-| Storage | localStorage (web) / chrome.storage (extension) |
+| Storage | localStorage (web) · chrome.storage (extension) |
 | Backend | Node.js + Express + SQLite |
-| Deploy | GitHub Pages (web) + any Node host (backend) |
+| Hosting | GitHub Pages (web) · any Node host (backend) |
 
 ---
 
 ## Privacy
 
-- Your Groq API key is stored only in your browser. Never sent anywhere except `api.groq.com`.
-- Session data stays local by default. Backend sync is opt-in and self-hosted.
-- The Chrome extension only activates on social media domains listed in `manifest.json`.
+- Groq API key stored only in your browser — sent only to `api.groq.com`
+- Session data is local by default — backend sync is opt-in and self-hosted
+- Chrome extension activates only on domains listed in `manifest.json`
+- No analytics, no tracking, no accounts
 
 ---
 
 ## License
 
 MIT
+
