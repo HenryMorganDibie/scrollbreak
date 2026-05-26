@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ScrollBreak</title>
+<style>
+  body {
+    width: 280px;
+    background: #0a0a0a;
+    color: #f0f0f0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    padding: 20px;
+    margin: 0;
+  }
+  .logo { font-size: 0.9rem; font-weight: 800; letter-spacing: 0.2em; margin-bottom: 16px; }
+  .logo span { color: #c8f135; }
+  .stat { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #1a1a1a; font-size: 0.82rem; }
+  .stat-val { color: #c8f135; font-weight: 700; }
+  label { display: block; font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase; color: #555; margin: 16px 0 6px; }
+  input { width: 100%; background: #111; border: 1px solid #222; color: #f0f0f0; padding: 8px 10px; font-size: 0.8rem; border-radius: 4px; outline: none; box-sizing: border-box; }
+  input:focus { border-color: #c8f135; }
+  button { width: 100%; background: #c8f135; color: #000; border: none; padding: 10px; font-weight: 700; font-size: 0.8rem; border-radius: 4px; cursor: pointer; margin-top: 10px; letter-spacing: 0.08em; }
+  .open-app { background: none; border: 1px solid #222; color: #555; margin-top: 8px; }
+  .open-app:hover { border-color: #c8f135; color: #c8f135; }
+  .status { font-size: 0.72rem; color: #555; margin-top: 12px; text-align: center; }
+</style>
+</head>
+<body>
+<div class="logo">SCROLL<span>BREAK</span></div>
+
+<div id="stats">
+  <div class="stat"><span>Sessions today</span><span class="stat-val" id="todayCount">0</span></div>
+  <div class="stat"><span>Goal rate</span><span class="stat-val" id="goalRate">—</span></div>
+  <div class="stat"><span>Last mood</span><span class="stat-val" id="lastMood">—</span></div>
+</div>
+
+<label>Groq API Key</label>
+<input type="password" id="keyInput" placeholder="gsk_..." />
+<button onclick="saveKey()">SAVE KEY</button>
+<button class="open-app" onclick="openApp()">OPEN FULL APP</button>
+<div class="status" id="status"></div>
+
+<script>
+  chrome.storage.local.get(['sb_groq_key', 'sb_sessions'], (result) => {
+    if (result.sb_groq_key) document.getElementById('keyInput').value = result.sb_groq_key;
+    const sessions = result.sb_sessions || [];
+    const today = sessions.filter(s => new Date(s.timestamp).toDateString() === new Date().toDateString());
+    document.getElementById('todayCount').textContent = today.length;
+    const withOutcome = sessions.filter(s => s.achieved);
+    const rate = withOutcome.length ? Math.round((withOutcome.filter(s=>s.achieved==='yes').length/withOutcome.length)*100) : null;
+    document.getElementById('goalRate').textContent = rate !== null ? `${rate}%` : '—';
+    const lastWithMood = sessions.find(s => s.mood);
+    document.getElementById('lastMood').textContent = lastWithMood?.mood || '—';
+  });
+
+  function saveKey() {
+    const key = document.getElementById('keyInput').value.trim();
+    if (!key) return;
+    chrome.storage.local.set({ sb_groq_key: key }, () => {
+      document.getElementById('status').textContent = '✅ Key saved';
+      setTimeout(() => document.getElementById('status').textContent = '', 2000);
+    });
+  }
+
+  function openApp() {
+    chrome.tabs.create({ url: chrome.runtime.getURL('../app/index.html') });
+  }
+</script>
+</body>
+</html>
