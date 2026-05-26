@@ -1,52 +1,121 @@
 # ScrollBreak 🛑
 
-> AI-powered doomscrolling intervention — intention setting, session timer, reflection journaling, and pattern coaching via Groq Llama.
+> AI-powered doomscrolling intervention — intention setting, session timer, reflection journaling, pattern coaching, team dashboards, and clinical analytics. Powered by Groq Llama.
+
+---
 
 ## What it does
 
-ScrollBreak is a single-file web app that helps you break the doomscrolling habit through three evidence-based interventions:
+ScrollBreak interrupts the doomscrolling habit at three points:
 
-- **Intention** — Before opening any app, you state *why* you are going there, pick a platform, and set a time limit. Llama coaches you on whether your intention is specific or a disguised urge to scroll.
-- **Reflect** — A session timer tracks how long you actually scrolled. After the session, you log your mood, whether you hit your goal, and a note. Llama gives a personalized debrief.
-- **History** — Every session is logged locally. Once you have several sessions, Llama analyzes your patterns across platforms and mood outcomes.
+**Before** — You state why you're opening a platform, set a time limit. Llama coaches you on whether your intention is specific or a cover for mindless scrolling.
 
-## Tech stack
+**During** — A session timer tracks actual vs. intended time. Hits red when your limit expires.
 
-| Layer | Choice |
-|---|---|
-| Frontend | Vanilla HTML/CSS/JS — zero dependencies, zero build step |
-| AI | Groq API — `llama-3.3-70b-versatile` |
-| Storage | `localStorage` — fully private, no backend |
-| Deploy | GitHub Pages (one click) |
+**After** — You log your mood and goal outcome. Llama gives a personalized debrief naming the pattern it sees.
 
-## Getting started
+**Over time** — Every session builds a local history. AI pattern analysis surfaces your biggest behavioral risks across platforms.
 
-1. Clone or download this repo
-2. Open `index.html` in any browser — no server needed
-3. Click **⚡ SET GROQ KEY** and paste your key from [console.groq.com](https://console.groq.com)
-4. Set your first intention and go
-
-## Deploy to GitHub Pages
-
-1. Go to repo **Settings → Pages**
-2. Source: **Deploy from branch → main → / (root)**
-3. Save — your app is live at `https://HenryMorganDibie.github.io/scrollbreak`
+---
 
 ## Project structure
 
 ```
 scrollbreak/
-├── index.html        ← entire app (UI + logic + Groq integration)
-├── README.md
-├── ARCHITECTURE.md   ← data flow and design decisions
-└── .gitignore
+├── app/                      ← Web app (GitHub Pages)
+│   ├── index.html            ← Entry point
+│   ├── css/
+│   │   └── main.css          ← All styles
+│   └── js/
+│       ├── storage.js        ← localStorage + backend sync
+│       ├── groq.js           ← Groq API client + prompts
+│       ├── app.js            ← Intention, reflect, history logic
+│       ├── dashboard.js      ← Family/team dashboard
+│       └── analytics.js      ← Clinical analytics + charts
+│
+├── extension/                ← Chrome extension
+│   ├── manifest.json         ← MV3 manifest
+│   ├── background.js         ← Service worker (tab interception)
+│   ├── content.js            ← Intention overlay injected into pages
+│   ├── content.css           ← Overlay styles
+│   └── popup.html            ← Extension popup
+│
+├── backend/                  ← Optional sync backend
+│   ├── server.js             ← Express + SQLite API
+│   └── package.json
+│
+├── docs/
+│   └── ARCHITECTURE.md
+│
+└── README.md
 ```
+
+---
+
+## Getting started
+
+### Web app (zero setup)
+
+1. Go to [henrymorgandibie.github.io/scrollbreak](https://henrymorgandibie.github.io/scrollbreak)
+2. Click **⚙ SETTINGS** → paste your [Groq API key](https://console.groq.com)
+3. Set your first intention
+
+### Chrome extension (local install)
+
+1. Clone this repo
+2. Open `chrome://extensions`
+3. Enable **Developer mode** (top right)
+4. Click **Load unpacked** → select the `/extension` folder
+5. Open any social media tab — ScrollBreak intercepts it
+
+### Backend (optional — for multi-device sync)
+
+```bash
+cd backend
+npm install
+node server.js
+```
+
+Deploy to Railway, Render, or Fly.io for production. Then in the web app Settings, add your backend URL and a user ID to enable sync.
+
+---
+
+## Features
+
+| Feature | Web App | Extension |
+|---|---|---|
+| Intention setting | ✅ | ✅ |
+| Llama AI coaching | ✅ | ✅ |
+| Session timer | ✅ | — |
+| Reflection journal | ✅ | — |
+| Pattern analysis | ✅ | — |
+| Family dashboard | ✅ | — |
+| Clinical analytics | ✅ | — |
+| Multi-device sync | ✅ (with backend) | — |
+| Tab interception | — | ✅ |
+
+---
+
+## Tech stack
+
+| Layer | Choice |
+|---|---|
+| Frontend | Vanilla HTML/CSS/JS |
+| AI | Groq API — `llama-3.3-70b-versatile` |
+| Storage | localStorage (web) / chrome.storage (extension) |
+| Backend | Node.js + Express + SQLite |
+| Deploy | GitHub Pages (web) + any Node host (backend) |
+
+---
 
 ## Privacy
 
-Your Groq API key is stored only in your browser localStorage. Session data never leaves your device. The only outbound request is to `api.groq.com` when Llama coaching is triggered.
+- Your Groq API key is stored only in your browser. Never sent anywhere except `api.groq.com`.
+- Session data stays local by default. Backend sync is opt-in and self-hosted.
+- The Chrome extension only activates on social media domains listed in `manifest.json`.
+
+---
 
 ## License
 
 MIT
-
