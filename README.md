@@ -6,17 +6,83 @@
 
 ---
 
+## ⚠️ Honest: What actually works
+
+| Feature | Works? | Notes |
+|---|---|---|
+| Web app (intention + reflect + history) | ✅ Full | Open manually at the URL below |
+| Chrome extension (tab interception) | ✅ Full | Intercepts social media on desktop Chrome |
+| AI coaching via Groq Llama | ✅ Full | Requires free Groq API key |
+| Family / team dashboard | ✅ Full | Data shared via same backend |
+| Clinical analytics | ✅ Full | Needs a few sessions logged first |
+| Multi-device sync | ✅ With backend | Self-host the Express server |
+| Blocking mobile apps (TikTok, Instagram etc.) | ❌ Not possible | Extensions cannot touch native apps |
+| Push notifications / reminders | ❌ Not built | Use phone Screen Time as enforcement layer |
+
+**Bottom line:** The Chrome extension has real teeth on desktop. On mobile, this is a friction-by-choice tool — it works if you open it intentionally. Pair it with iPhone Screen Time or Android Digital Wellbeing for hard enforcement on your phone.
+
+---
+
 ## What it does
 
 ScrollBreak interrupts the doomscrolling habit at three points:
 
-**Before** — You state why you're opening a platform, set a time limit. Llama coaches you on whether your intention is specific or a cover for mindless scrolling.
+**Before** — State why you're opening a platform and set a time limit. Llama coaches you on whether your intention is genuine or a cover for mindless scrolling.
 
-**During** — A session timer tracks actual vs. intended time. Hits red when your limit expires.
+**During** — A session timer tracks actual vs. intended time. Flashes red when your limit expires.
 
-**After** — You log your mood and goal outcome. Llama gives a personalized debrief naming the pattern it sees.
+**After** — Log your mood and whether you hit your goal. Llama gives a personalized debrief naming the pattern it sees.
 
 **Over time** — Every session builds a local history. AI pattern analysis surfaces your biggest behavioral risks across platforms.
+
+---
+
+## Getting started
+
+### Web app
+
+1. Go to [henrymorgandibie.github.io/scrollbreak](https://henrymorgandibie.github.io/scrollbreak)
+2. Click **⚙ SETTINGS** → paste your [Groq API key](https://console.groq.com) (free)
+3. Pick a platform, write your intention, set a time limit
+4. Hit **SET INTENTION + GET COACHING**
+
+### Chrome extension (real tab interception — desktop only)
+
+The extension intercepts Chrome tabs when you navigate to Twitter/X, YouTube, Instagram, TikTok, Reddit, or news sites — and forces an intention screen before the page loads.
+
+**Install (local):**
+1. Clone or download this repo
+2. Open `chrome://extensions` in Chrome
+3. Toggle **Developer mode** ON (top right)
+4. Click **Load unpacked**
+5. Select the `/extension` folder from this repo
+6. Done — open YouTube and see it intercept
+
+**To add your Groq key to the extension:**
+- Click the ScrollBreak icon in your Chrome toolbar
+- Paste your Groq key in the popup
+- The extension will now show Llama coaching inside the overlay
+
+**Platforms intercepted:** Twitter/X · Instagram · TikTok · YouTube · Reddit · Google News · BBC · CNN
+
+### On mobile (workaround)
+
+Since browser extensions don't work on mobile apps:
+
+1. **Delete the native apps** from your phone (Twitter, TikTok, Instagram)
+2. Access them only via Safari or Chrome mobile — the friction helps
+3. Bookmark `henrymorgandibie.github.io/scrollbreak` and open it first
+4. Use **iPhone Screen Time** or **Android Digital Wellbeing** for hard time limits
+
+### Backend sync (optional)
+
+```bash
+cd backend
+npm install
+node server.js
+```
+
+Deploy to Railway or Render for production. Add your backend URL + user ID in Settings to sync across devices.
 
 ---
 
@@ -35,64 +101,18 @@ scrollbreak/
 │       ├── dashboard.js      ← Family/team dashboard
 │       └── analytics.js      ← Clinical analytics + charts
 ├── extension/                ← Chrome extension
-│   ├── manifest.json         ← MV3
+│   ├── manifest.json
 │   ├── background.js         ← Tab interception service worker
 │   ├── content.js            ← Intention overlay injected into pages
 │   ├── content.css
 │   └── popup.html
-├── backend/                  ← Optional self-hosted sync server
+├── backend/                  ← Optional sync server
 │   ├── server.js             ← Express + SQLite
 │   └── package.json
-├── docs/
-│   ├── ARCHITECTURE.md
-│   └── screenshot.svg
-└── README.md
+└── docs/
+    ├── ARCHITECTURE.md
+    └── screenshot.svg
 ```
-
----
-
-## Getting started
-
-### Web app (zero setup)
-
-1. Go to [henrymorgandibie.github.io/scrollbreak](https://henrymorgandibie.github.io/scrollbreak)
-2. Click **⚙ SETTINGS** → paste your [Groq API key](https://console.groq.com)
-3. Pick a platform, write your intention, set a time limit
-4. Hit **SET INTENTION + GET COACHING** — Llama responds instantly
-
-### Chrome extension (intercepts social media tabs)
-
-1. Clone this repo
-2. Open `chrome://extensions`
-3. Enable **Developer mode** (top right toggle)
-4. Click **Load unpacked** → select the `/extension` folder
-5. Open Twitter, YouTube, TikTok — ScrollBreak intercepts before the page loads
-
-### Backend (optional — multi-device sync)
-
-```bash
-cd backend
-npm install
-node server.js
-```
-
-Deploy to Railway, Render, or Fly.io. Then in Settings, add your backend URL and a user ID to sync sessions across devices.
-
----
-
-## Features
-
-| Feature | Web App | Extension |
-|---|---|---|
-| Intention check before scrolling | ✅ | ✅ |
-| Llama AI coaching | ✅ | ✅ |
-| Session timer with limit alert | ✅ | — |
-| Mood + reflection journal | ✅ | — |
-| AI pattern analysis | ✅ | — |
-| Family / team dashboard | ✅ | — |
-| Clinical analytics view | ✅ | — |
-| Multi-device sync | ✅ (with backend) | — |
-| Tab interception overlay | — | ✅ |
 
 ---
 
