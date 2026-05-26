@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#0a0a0a">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="SCROLL BREAK"
+            android:textColor="#c8f135"
+            android:textSize="16sp"
+            android:letterSpacing="0.2"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="24dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Android App"
+            android:textColor="#444444"
+            android:textSize="12sp"
+            android:layout_marginBottom="32dp" />
+
+        <!-- Accessibility status -->
+        <TextView
+            android:id="@+id/accessibilityStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="13sp"
+            android:lineSpacingMultiplier="1.5"
+            android:layout_marginBottom="16dp" />
+
+        <Button
+            android:id="@+id/enableAccessibilityBtn"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="ENABLE ACCESSIBILITY SERVICE"
+            android:backgroundTint="#c8f135"
+            android:textColor="#000000"
+            android:textStyle="bold"
+            android:letterSpacing="0.08"
+            android:layout_marginBottom="32dp" />
+
+        <!-- Groq key -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="GROQ API KEY"
+            android:textColor="#555555"
+            android:textSize="10sp"
+            android:letterSpacing="0.2"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/groqKeyInput"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@drawable/input_bg"
+            android:padding="12dp"
+            android:textColor="#f0f0f0"
+            android:textColorHint="#444444"
+            android:hint="gsk_..."
+            android:inputType="textPassword"
+            android:layout_marginBottom="12dp" />
+
+        <Button
+            android:id="@+id/saveKeyBtn"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="SAVE KEY"
+            android:backgroundTint="#c8f135"
+            android:textColor="#000000"
+            android:textStyle="bold"
+            android:layout_marginBottom="32dp" />
+
+        <!-- Session count -->
+        <TextView
+            android:id="@+id/sessionCount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="0 sessions logged"
+            android:textColor="#555555"
+            android:textSize="13sp"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Open web app -->
+        <Button
+            android:id="@+id/openWebAppBtn"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="OPEN FULL WEB APP"
+            android:backgroundTint="#161616"
+            android:textColor="#c8f135"
+            android:layout_marginBottom="24dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Apps intercepted: Twitter/X · Instagram · TikTok · YouTube · Reddit · Facebook · Snapchat"
+            android:textColor="#333333"
+            android:textSize="11sp"
+            android:lineSpacingMultiplier="1.5" />
+
+    </LinearLayout>
+</ScrollView>
