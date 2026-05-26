@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#0a0a0a"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <!-- Logo -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="SCROLL BREAK"
+            android:textColor="#c8f135"
+            android:textSize="13sp"
+            android:letterSpacing="0.2"
+            android:textStyle="bold"
+            android:layout_marginBottom="28dp" />
+
+        <!-- Question -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Why are you opening"
+            android:textColor="#f0f0f0"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="4dp" />
+
+        <TextView
+            android:id="@+id/platformLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="this app"
+            android:textColor="#c8f135"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="24dp" />
+
+        <!-- Intention input -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="YOUR INTENTION"
+            android:textColor="#555555"
+            android:textSize="10sp"
+            android:letterSpacing="0.2"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/intentInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="80dp"
+            android:background="@drawable/input_bg"
+            android:padding="14dp"
+            android:textColor="#f0f0f0"
+            android:textColorHint="#444444"
+            android:hint="Be specific — e.g. checking one DM, watching a specific video..."
+            android:inputType="textMultiLine"
+            android:gravity="top"
+            android:layout_marginBottom="20dp" />
+
+        <!-- Time limit -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="TIME LIMIT"
+            android:textColor="#555555"
+            android:textSize="10sp"
+            android:letterSpacing="0.2"
+            android:layout_marginBottom="8dp" />
+
+        <RadioGroup
+            android:id="@+id/timeGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="24dp">
+
+            <RadioButton android:id="@+id/time10"
+                android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:text="10m"
+                android:textColor="#f0f0f0" android:buttonTint="#c8f135" />
+            <RadioButton android:id="@+id/time15"
+                android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:text="15m"
+                android:textColor="#f0f0f0" android:buttonTint="#c8f135"
+                android:checked="true" />
+            <RadioButton android:id="@+id/time20"
+                android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:text="20m"
+                android:textColor="#f0f0f0" android:buttonTint="#c8f135" />
+            <RadioButton android:id="@+id/time30"
+                android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:text="30m"
+                android:textColor="#f0f0f0" android:buttonTint="#c8f135" />
+        </RadioGroup>
+
+        <!-- AI response box -->
+        <LinearLayout
+            android:id="@+id/aiBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/ai_box_bg"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="🤖  LLAMA VIA GROQ"
+                android:textColor="#c8f135"
+                android:textSize="9sp"
+                android:letterSpacing="0.2"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/aiResponse"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="#f0f0f0"
+                android:textSize="13sp"
+                android:lineSpacingMultiplier="1.6" />
+        </LinearLayout>
+
+        <!-- Proceed button -->
+        <Button
+            android:id="@+id/proceedBtn"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="SET INTENTION &amp; PROCEED"
+            android:backgroundTint="#c8f135"
+            android:textColor="#000000"
+            android:textStyle="bold"
+            android:letterSpacing="0.1"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Skip button -->
+        <Button
+            android:id="@+id/skipBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Skip (no intention)"
+            android:background="@android:color/transparent"
+            android:textColor="#444444"
+            android:textSize="13sp" />
+
+    </LinearLayout>
+</ScrollView>
